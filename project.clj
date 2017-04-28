@@ -1,8 +1,7 @@
-(defproject cybozu-http "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+(defproject ayato_p/cybozu-http "0.1.0-SNAPSHOT"
+  :description "Cybozu HTTP client for Clojure"
+  :url "https://github.com/ayato-p/cybozu-http-clj"
+  :license {:name "MIT"}
   :dependencies [[clj-http "3.5.0"]
                  [cheshire "5.7.1"]
                  [camel-snake-kebab "0.4.0"]]
