@@ -1,1 +1,7 @@
 * cybozu-http-clj
+
+  Cybozu HTTP client for Clojure
+
+  Latest version is
+
+  [[https://clojars.org/ayato_p/cybozu-http][https://img.shields.io/clojars/v/ayato_p/cybozu-http.svg]]
