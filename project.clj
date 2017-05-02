@@ -11,8 +11,7 @@
                                      :creds :gpg}]]
 
   :dependencies [[clj-http "3.5.0"]
-                 [cheshire "5.7.1"]
-                 [camel-snake-kebab "0.4.0"]]
+                 [cheshire "5.7.1"]]
   :profiles
   {:dev {:dependencies [[org.clojure/clojure "1.8.0"]]}
    :1.6 {:dependencies [[org.clojure/clojure "1.6.0"]]}
