@@ -54,20 +54,24 @@
 
   ([fn-name method api-url argsv opt-argsv]
    (let [fn-name* (symbol (str fn-name "*"))
+         opts-arg (cond-> {:as 'opts} (seq opt-argsv) (assoc :keys opt-argsv))
          arglists (-> (into ['auth] argsv)
-                      (conj '& {:keys opt-argsv :as 'opts})
+                      (conj '& opts-arg)
                       list)
          opt-arg-keys (map keyword opt-argsv)]
      `(do
-        (defn ~fn-name* [~'auth ~@argsv & {:keys ~opt-argsv :as ~'opts}]
+        (defn ~fn-name* [~'auth ~@argsv & ~opts-arg]
           (let [params# (assoc {} ~@(mapcat vector (map csk/->camelCaseKeyword argsv) argsv))
                 params# (reduce (fn [m# [k# v#]] (cond-> m# v# (assoc k# v#)))
                                 params#
-                                (->> (interleave '~(map csk/->camelCaseKeyword opt-arg-keys)
-                                                 ((juxt ~@opt-arg-keys) ~'opts))
-                                     (partition 2)))
+                                ~(when (seq opt-argsv)
+                                   `(->> (interleave '~(map csk/->camelCaseKeyword opt-arg-keys)
+                                                     ((juxt ~@opt-arg-keys) ~'opts))
+                                         (partition 2))))
                 params# (build-params ~method params#)
-                ~'opts (dissoc ~'opts ~@opt-arg-keys)]
+                ~'opts (if (seq ~opt-argsv)
+                         (dissoc ~'opts ~@opt-arg-keys)
+                         ~'opts)]
             (apply api-call ~'auth ~method ~api-url params# ~'opts)))
 
         (def ~(vary-meta fn-name merge `{:arglists '~arglists})
