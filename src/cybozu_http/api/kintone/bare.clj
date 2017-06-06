@@ -55,7 +55,7 @@
   ;; -> `[(foo bar), (foo-id bar-id)]`"
   [argsv]
   (let [v (partition 3 argsv)]
-    [(map first v) (map #(nth % 2) v)]))
+    [(mapv first v) (mapv #(nth % 2) v)]))
 
 (defmacro defapi
   ([fn-name method api-url argsv]
@@ -77,7 +77,7 @@
                 params# (reduce (fn [m# [k# v#]] (cond-> m# v# (assoc k# v#)))
                                 params#
                                 ~(when (seq opt-param-names)
-                                   (map vector actual-opt-param-names opt-param-names)))
+                                   (mapv vector actual-opt-param-names opt-param-names)))
                 params# (build-params ~method params#)
                 ~'opts ~(if (seq opt-param-names)
                           `(dissoc ~'opts ~@opt-param-names)
