@@ -73,7 +73,8 @@
                          list)]
      `(do
         (defn ~fn-name* [~'auth ~@param-names & ~fn-opts-param]
-          (let [params# (assoc {} ~@(interleave actual-param-names param-names))
+          (let [params# ~(when (seq param-names)
+                           `(assoc {} ~@(interleave actual-param-names param-names)))
                 params# (reduce (fn [m# [k# v#]] (cond-> m# v# (assoc k# v#)))
                                 params#
                                 ~(when (seq opt-param-names)
