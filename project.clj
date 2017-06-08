@@ -5,8 +5,8 @@
             :url "http://opensource.org/licenses/MIT"}
 
   :deploy-repositories [["snapshots" {:url      "https://clojars.org/repo/"
-                                      :username [:gpg :env/clojars_username]
-                                      :password [:gpg :env/clojars_password]}]
+                                      :username [:gpg :env]
+                                      :password [:gpg :env]}]
                         ["releases" {:url   "https://clojars.org/repo/"
                                      :creds :gpg}]]
 
