@@ -4,4 +4,5 @@
 
   Latest version is
 
+  [[https://app.wercker.com/project/byKey/740d77c301264b2775cce0212e18fe21][https://app.wercker.com/status/740d77c301264b2775cce0212e18fe21/s/master]]
   [[https://clojars.org/ayato_p/cybozu-http][https://img.shields.io/clojars/v/ayato_p/cybozu-http.svg]]
