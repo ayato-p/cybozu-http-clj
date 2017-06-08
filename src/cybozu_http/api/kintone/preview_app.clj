@@ -20,13 +20,15 @@
   [revert :- revert])
 
 (defn deploy [auth app-id & {:keys [revert] :as opts}]
-  (deploy-apps auth [{:app app-id}] :revert (or revert false)))
+  (deploy-apps auth [{:app app-id}] opts))
 
 (defapi get-deploy-statuses :get deploy-url
   [apps :- app-ids])
 
 (defn get-deploy-status [auth app-id]
-  (get-deploy-statuses auth [app-id]))
+  (-> (get-deploy-statuses auth [app-id])
+      :apps
+      first))
 
 ;;; general configurations
 ;;; doc https://developer.cybozu.io/hc/ja/articles/204694170

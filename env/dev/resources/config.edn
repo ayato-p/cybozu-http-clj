@@ -1,4 +1,8 @@
 {$override* "./local-config.edn"
- :subdomain #env :kintone-subdomain
- :login-name #env :kintone-login-name
- :password #env :kintone-password}
+ :login-info
+ {:subdomain  #env :kintone-subdomain
+  :login-name #env :kintone-login-name
+  :password   #env :kintone-password}
+
+ :space
+ {:template-id 1}}

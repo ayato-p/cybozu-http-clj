@@ -1,13 +1,14 @@
 (ns test-helper
   (:require [baum.core :as b]
             [clojure.java.io :as io]
-            [cybozu-http.api.kintone.preview-app :as preview-app]))
+            [cybozu-http.api.kintone.preview-app :as preview-app]
+            [cybozu-http.api.kintone.space :as space]))
 
-(defn read-auth-info* []
+(defn read-config-file* []
   (b/read-file (io/resource "config.edn")))
 
-(def read-auth-info
-  (memoize read-auth-info*))
+(def read-config-file
+  (memoize read-config-file*))
 
 (def app-fields
   {"single_text"     {:code           "single_text"
@@ -204,20 +205,45 @@
                               {:value {"single_text_in_table" {:value "single_text_in_table value2"}}}]}})
 
 
-(defn create-test-app [auth]
-  (let [res (preview-app/create auth "cybozu-http test app")
+(defn create-test-space
+  ([auth] (create-test-space auth false))
+  ([auth guest?]
+   (let [template-id (get-in (read-config-file) [:space :template-id])
+         members [{:entity {:type "USER" :code (:login-name auth)}
+                   :isAdmin true}]]
+     (:id (space/post auth template-id "cybozu-http test space" members)))))
+
+(defn create-test-app [auth space-id thread-id]
+  (let [res (->> {:space-id space-id :thread-id thread-id}
+                 (preview-app/create auth "cybozu-http test app"))
         app-id (:app res)]
-    (preview-app/put-settings auth app-id
-                              :nmae "cybozu-http test app"
-                              :description "cybozu-http test app"
-                              :icon {:type "PRESET" :key "APP42"}
-                              :theme "RED")
+    (preview-app/put-settings auth app-id {:nmae "cybozu-http test app"
+                                           :description "cybozu-http test app"
+                                           :icon {:type "PRESET" :key "APP42"}
+                                           :theme "RED"})
     (preview-app/post-fields auth app-id app-fields)
     (preview-app/put-layout auth app-id app-layout)
     (preview-app/put-views auth app-id app-views)
     (preview-app/deploy auth app-id)
     (let [continue? (atom true)]
       (while @continue?
-        (if-not (= (preview-app/get-deploy-status auth app-id) "PROCESSING")
+        (if-not (= (:status (preview-app/get-deploy-status auth app-id)) "PROCESSING")
           (reset! continue? false))))
     app-id))
+
+(defn- setup [db]
+  (let [auth (:login-info (read-config-file))
+        space-id (create-test-space auth)
+        thread-id (:defaultThread (space/get auth space-id))
+        app-id (create-test-app auth space-id thread-id)]
+    (swap! db assoc :auth auth :space-id space-id :thread-id thread-id :app-id app-id)))
+
+(defn- teardown [db]
+  (space/delete (:auth @db) (:space-id @db))
+  (reset! db {}))
+
+(defn wrap-setup [db]
+  (fn [f]
+    (setup db)
+    (f)
+    (teardown db)))
