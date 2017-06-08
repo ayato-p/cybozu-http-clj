@@ -10,3 +10,8 @@ build:
         - sharpershape/cache:
             name: "Store dependencies to cache"
             action: store
+deploy:
+    steps:
+        - script:
+            name: "Deploy to Clojars"
+            code: lein deploy
