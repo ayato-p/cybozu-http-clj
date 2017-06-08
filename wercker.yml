@@ -1,0 +1,12 @@
+box: ayato/docker-clojure-with-rsync
+build:
+    steps:
+        - sharpershape/cache:
+            name: "Restore dependencies from cache"
+            action: restore
+        - script:
+            name: "Run tests"
+            code: lein eftest
+        - sharpershape/cache:
+            name: "Store dependencies to cache"
+            action: store
