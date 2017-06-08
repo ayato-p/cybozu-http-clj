@@ -1,6 +1,7 @@
 (ns cybozu-http.api.kintone.bare
   (:require [cheshire.core :as c]
-            [clj-http.client :as cli])
+            [clj-http.client :as cli]
+            [slingshot.slingshot :refer [try+]])
   (:import java.util.Base64))
 
 (def protocol "https://")
@@ -39,7 +40,13 @@
              :delete cli/delete)
          url (generate-url auth api-url (:guest-space-id opts))
          headers (auth-headers auth)]
-     (f url (merge headers params)))))
+     (try+
+       (f url (merge headers params))
+       (catch [:type :clj-http.client/unexceptional-status] {:keys [status body]}
+         (throw (ex-info "kintone api error"
+                         (-> (c/parse-string body true)
+                             (assoc :status status)
+                             (assoc :type :cybozu-http.api.kintone/exception)))))))))
 
 (defmulti build-params (fn [method params] method))
 
@@ -59,9 +66,12 @@
 
 (defmacro defapi
   ([fn-name method api-url argsv]
-   `(defapi ~fn-name ~method ~api-url ~argsv nil))
+   `(defapi ~fn-name ~method ~api-url ~argsv [] []))
 
   ([fn-name method api-url argsv opt-argsv]
+   `(defapi ~fn-name ~method ~api-url ~argsv ~opt-argsv []))
+
+  ([fn-name method api-url argsv opt-argsv returning-keys]
    (let [fn-name* (symbol (str fn-name "*"))
          [actual-param-names param-names] (extract-args argsv)
          [actual-opt-param-names opt-param-names] (extract-args opt-argsv)
@@ -72,18 +82,29 @@
                          (conj '& fn-opts-param)
                          list)]
      `(do
-        (defn ~fn-name* [~'auth ~@param-names & ~fn-opts-param]
-          (let [params# ~(when (seq param-names)
-                           `(assoc {} ~@(interleave actual-param-names param-names)))
-                params# (reduce (fn [m# [k# v#]] (cond-> m# v# (assoc k# v#)))
-                                params#
-                                ~(when (seq opt-param-names)
-                                   (mapv vector actual-opt-param-names opt-param-names)))
-                params# (build-params ~method params#)
-                ~'opts ~(if (seq opt-param-names)
-                          `(dissoc ~'opts ~@opt-param-names)
-                          'opts)]
-            (api-call ~'auth ~method ~api-url params# ~'opts)))
+        (defn ~fn-name*
+          ([~'auth ~@param-names]
+           (~fn-name* ~'auth ~@param-names {}))
+          ([~'auth ~@param-names ~fn-opts-param]
+           (let [params# ~(when (seq param-names)
+                            `(assoc {} ~@(interleave actual-param-names param-names)))
+                 params# (reduce (fn [m# [k# v#]] (cond-> m# v# (assoc k# v#)))
+                                 params#
+                                 ~(when (seq opt-param-names)
+                                    (mapv vector actual-opt-param-names opt-param-names)))
+                 params# (build-params ~method params#)
+                 ~'opts ~(if (seq opt-param-names)
+                           `(dissoc ~'opts ~@opt-param-names)
+                           'opts)]
+             (api-call ~'auth ~method ~api-url params# ~'opts))))
 
-        (def ~(vary-meta fn-name merge `{:arglists '~fn-arglists})
-          (comp #(c/parse-string % true) :body ~fn-name*))))))
+        (defn ~fn-name
+          ([~'auth ~@param-names]
+           (~fn-name ~'auth ~@param-names {}))
+          ([~'auth ~@param-names ~fn-opts-param]
+           (-> (~fn-name* ~'auth ~@param-names ~'opts)
+               :body
+               (c/parse-string true)
+               ~(if (seq returning-keys)
+                  `(get-in ~returning-keys)
+                  identity))))))))
