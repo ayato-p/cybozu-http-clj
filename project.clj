@@ -18,4 +18,4 @@
                         [rkworks/baum "0.4.0"]]
          :plugins [[lein-eftest "0.3.1"]]}
    :1.8 {:dependencies [[org.clojure/clojure "1.8.0"]]}
-   :1.9 {:dependencies [[org.clojure/clojure "1.9.0-alpha16"]]}})
+   :1.9 {:dependencies [[org.clojure/clojure "1.9.0-alpha17"]]}})
