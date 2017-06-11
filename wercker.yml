@@ -6,7 +6,7 @@ build:
             action: restore
         - script:
             name: "Run tests"
-            code: lein with-profiles +1.8:+1.9 eftest
+            code: lein all-test
         - sharpershape/cache:
             name: "Store dependencies to cache"
             action: store
