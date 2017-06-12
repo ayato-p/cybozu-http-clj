@@ -8,7 +8,8 @@
    members :- members]
   [isPrivate   :- private?
    isGuest     :- guest?
-   fixedMember "-" fixed-member])
+   fixedMember "-" fixed-member]
+  [:id])
 
 (def space-url "/space.json")
 
@@ -23,7 +24,9 @@
    body :- body])
 
 (defapi get-members :get "/space/members.json"
-  [id :- space-id])
+  [id :- space-id]
+  []
+  [:members])
 
 (defapi put-members :put "/space/members.json"
   [id      :- space-id

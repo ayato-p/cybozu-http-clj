@@ -211,7 +211,7 @@
    (let [template-id (get-in (read-config-file) [:space :template-id])
          members [{:entity {:type "USER" :code (:login-name auth)}
                    :isAdmin true}]]
-     (:id (space/post auth template-id "cybozu-http test space" members)))))
+     (space/post auth template-id "cybozu-http test space" members))))
 
 (defn create-test-app [auth space-id thread-id]
   (let [res (->> {:space-id space-id :thread-id thread-id}
