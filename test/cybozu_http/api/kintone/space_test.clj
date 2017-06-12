@@ -34,7 +34,10 @@
       (t/is (= (:name res) "hello my space"))
       (t/is (every? #(contains? res %) [:fixedMember :memberCount :coverUrl :modifier :creator
                                         :defaultThread :name :coverType :useMultiThread :id
-                                        :attachedApps :isPrivate :body :isGuest :coverKey])))))
+                                        :attachedApps :isPrivate :body :isGuest :coverKey]))
+
+      ;; clean-up
+      (s/delete auth space-id))))
 
 (t/deftest put-body-test
   (t/testing "space put body test"

@@ -9,4 +9,5 @@
    name     :- name
    spaceIds :- space-ids
    limit    :- limit
-   offset   :- offset])
+   offset   :- offset]
+  [:apps])
