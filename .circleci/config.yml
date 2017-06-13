@@ -1,0 +1,23 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/cybozu-http-clj
+    docker:
+      - image: clojure:lein-2.7.1-alpine
+    steps:
+      - checkout
+      - restore_cache:
+          key: cybozu-http-clj-{{ checksum "project.clj" }}
+      - run: lein with-profiles +1.8,+1.9 deps
+      - save_cache:
+          paths:
+            - ~/.m2
+            - ~/.lein
+          key: cybozu-http-clj-{{ checksum "project.clj" }}
+      - run: lein all-test
+      - deploy:
+          name: Maybe Deploy
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              lein deploy clojars
+            fi
