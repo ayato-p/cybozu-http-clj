@@ -12,10 +12,12 @@
 
   :dependencies [[clj-http "3.5.0"]
                  [cheshire "5.7.1"]]
+
+  :aliases {"all-test" ["with-profiles" "+1.8:+1.9" "test"]}
+
   :profiles
   {:dev {:resource-paths ["env/dev/resources"]
          :dependencies [[org.clojure/clojure "1.8.0"]
-                        [rkworks/baum "0.4.0"]]
-         :plugins [[lein-eftest "0.3.1"]]}
+                        [rkworks/baum "0.4.0"]]}
    :1.8 {:dependencies [[org.clojure/clojure "1.8.0"]]}
    :1.9 {:dependencies [[org.clojure/clojure "1.9.0-alpha17"]]}})

@@ -16,7 +16,7 @@
       (t/is (contains? res :revision))
 
       (t/is (re-matches #"^\d+$" (:id res)))
-      (t/is (re-matches #"^\d+$" (:revision res))))))
+      (t/is (= (:revision res) "1")))))
 
 (t/deftest get-test
   (t/testing "record get test"

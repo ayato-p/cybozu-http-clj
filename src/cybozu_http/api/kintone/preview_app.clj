@@ -23,11 +23,12 @@
   (deploy-apps auth [{:app app-id}] opts))
 
 (defapi get-deploy-statuses :get deploy-url
-  [apps :- app-ids])
+  [apps :- app-ids]
+  []
+  [:apps])
 
 (defn get-deploy-status [auth app-id]
   (-> (get-deploy-statuses auth [app-id])
-      :apps
       first))
 
 ;;; general configurations

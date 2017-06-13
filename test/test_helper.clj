@@ -205,13 +205,21 @@
                               {:value {"single_text_in_table" {:value "single_text_in_table value2"}}}]}})
 
 
+(defn wait-deploying [auth app-ids]
+  (let [continue? (atom true)]
+    (while @continue?
+      (when (->> (preview-app/get-deploy-statuses auth app-ids)
+                 (map :status)
+                 (every? #(not= % "PROCESSING")))
+        (reset! continue? false)))))
+
 (defn create-test-space
   ([auth] (create-test-space auth false))
   ([auth guest?]
    (let [template-id (get-in (read-config-file) [:space :template-id])
          members [{:entity {:type "USER" :code (:login-name auth)}
                    :isAdmin true}]]
-     (:id (space/post auth template-id "cybozu-http test space" members)))))
+     (space/post auth template-id "cybozu-http test space" members))))
 
 (defn create-test-app [auth space-id thread-id]
   (let [res (->> {:space-id space-id :thread-id thread-id}
@@ -225,10 +233,7 @@
     (preview-app/put-layout auth app-id app-layout)
     (preview-app/put-views auth app-id app-views)
     (preview-app/deploy auth app-id)
-    (let [continue? (atom true)]
-      (while @continue?
-        (if-not (= (:status (preview-app/get-deploy-status auth app-id)) "PROCESSING")
-          (reset! continue? false))))
+    (wait-deploying auth [app-id])
     app-id))
 
 (defn- setup [db]

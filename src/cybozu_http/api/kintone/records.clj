@@ -14,7 +14,9 @@
 
 (defapi put :put "/records.json"
   [app     :- app-id
-   records :- records])
+   records :- records]
+  []
+  [:records])
 
 (defapi delete :delete "/records.json"
   [app :- app-id
