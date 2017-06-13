@@ -1,4 +1,4 @@
-# cybozu-http-clj [![wercker status](https://app.wercker.com/status/740d77c301264b2775cce0212e18fe21/s/master "wercker status")](https://app.wercker.com/project/byKey/740d77c301264b2775cce0212e18fe21)
+# cybozu-http-clj [![CircleCI](https://circleci.com/gh/ayato-p/cybozu-http-clj.svg?style=svg)](https://circleci.com/gh/ayato-p/cybozu-http-clj)
 
 Cybozu HTTP client for Clojure
 
