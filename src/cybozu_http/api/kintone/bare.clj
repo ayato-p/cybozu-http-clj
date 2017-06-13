@@ -11,9 +11,10 @@
 
 (defn generate-url
   [{:keys [domain subdomain] :as auth :or {domain "cybozu.com"}} api-url guest-space-id]
+  {:pre [(seq subdomain)]}
   (let [base-url (str protocol subdomain "." domain)]
     (-> (if guest-space-id
-          (str base-url guest-space-id "/v1")
+          (str base-url guest-space-prefix guest-space-id "/v1")
           (str base-url api-prefix))
         (str api-url))))
 
