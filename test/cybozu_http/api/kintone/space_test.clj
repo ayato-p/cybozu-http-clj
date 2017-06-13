@@ -41,7 +41,12 @@
 
 (t/deftest put-body-test
   (t/testing "space put body test"
-    (let [{:keys [auth space-id]} @db
+    (let [conf (h/read-config-file)
+          auth (:login-info conf)
+          template-id (get-in conf [:space :template-id])
+          members [{:entity {:type "USER" :code (:login-name auth)}
+                    :isAdmin true}]
+          space-id (s/post auth template-id "hello my space" members)
           before (s/get auth space-id)
           res (s/put-body auth space-id "Memory Trash Can")
           after (s/get auth space-id)]
@@ -51,7 +56,12 @@
 
 (t/deftest get-members-test
   (t/testing "space get members test"
-    (let [{:keys [auth space-id]} @db
+    (let [conf (h/read-config-file)
+          auth (:login-info conf)
+          template-id (get-in conf [:space :template-id])
+          members [{:entity {:type "USER" :code (:login-name auth)}
+                    :isAdmin true}]
+          space-id (s/post auth template-id "hello my space" members)
           res (s/get-members auth space-id)]
       (t/is (= (count res) 1))
       (t/is (= (get-in res [0 :entity :code]) (:login-name auth))))))
