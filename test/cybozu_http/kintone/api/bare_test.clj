@@ -1,6 +1,6 @@
-(ns cybozu-http.api.kintone.bare-test
+(ns cybozu-http.kintone.api.bare-test
   (:require [clojure.test :as t]
-            [cybozu-http.api.kintone.bare :as b]
+            [cybozu-http.kintone.api.bare :as b]
             [test-helper :as h]))
 
 (t/deftest generate-url-test

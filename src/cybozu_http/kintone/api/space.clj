@@ -1,6 +1,6 @@
-(ns cybozu-http.api.kintone.space
+(ns cybozu-http.kintone.api.space
   (:refer-clojure :exclude [get])
-  (:require [cybozu-http.api.kintone.bare :refer [defapi]]))
+  (:require [cybozu-http.kintone.api.bare :refer [defapi]]))
 
 (defapi post :post "/template/space.json"
   [id      :- template-id

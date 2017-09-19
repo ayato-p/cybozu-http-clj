@@ -1,6 +1,6 @@
-(ns cybozu-http.api.kintone.record
+(ns cybozu-http.kintone.api.record
   (:refer-clojure :exclude [get])
-  (:require [cybozu-http.api.kintone.bare :refer [defapi]]))
+  (:require [cybozu-http.kintone.api.bare :refer [defapi]]))
 
 (defapi get :get "/record.json"
   [app :- app-id

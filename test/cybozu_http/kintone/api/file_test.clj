@@ -1,9 +1,9 @@
-(ns cybozu-http.api.kintone.file-test
-  (:require [clojure.test :as t]
-            [cybozu-http.api.kintone.file :as f]
-            [test-helper :as h]
-            [clojure.java.io :as io]
-            [cybozu-http.api.kintone.record :as r]))
+(ns cybozu-http.kintone.api.file-test
+  (:require [clojure.java.io :as io]
+            [clojure.test :as t]
+            [cybozu-http.kintone.api.file :as f]
+            [cybozu-http.kintone.api.record :as r]
+            [test-helper :as h]))
 
 (def db (atom {}))
 

@@ -1,5 +1,5 @@
-(ns cybozu-http.api.kintone.thread
-  (:require [cybozu-http.api.kintone.bare :refer [defapi]]))
+(ns cybozu-http.kintone.api.thread
+  (:require [cybozu-http.kintone.api.bare :refer [defapi]]))
 
 (defapi put :put "/space/thread.json"
   [id :- thread-id]

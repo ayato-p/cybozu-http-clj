@@ -1,5 +1,5 @@
-(ns cybozu-http.api.kintone.guests
-  (:require [cybozu-http.api.kintone.bare :refer [defapi]]))
+(ns cybozu-http.kintone.api.guests
+  (:require [cybozu-http.kintone.api.bare :refer [defapi]]))
 
 (defapi post :post "/guests.json"
   [guests :- guests])

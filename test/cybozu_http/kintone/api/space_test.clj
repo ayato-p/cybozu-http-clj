@@ -1,8 +1,8 @@
-(ns cybozu-http.api.kintone.space-test
-  (:require [clojure.test :as t]
-            [cybozu-http.api.kintone.space :as s]
-            [test-helper :as h]
-            [clojure.set :as set]))
+(ns cybozu-http.kintone.api.space-test
+  (:require [clojure.set :as set]
+            [clojure.test :as t]
+            [cybozu-http.kintone.api.space :as s]
+            [test-helper :as h]))
 
 (def db (atom {}))
 

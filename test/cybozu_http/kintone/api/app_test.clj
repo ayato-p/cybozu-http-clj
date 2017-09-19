@@ -1,6 +1,6 @@
-(ns cybozu-http.api.kintone.app-test
+(ns cybozu-http.kintone.api.app-test
   (:require [clojure.test :as t]
-            [cybozu-http.api.kintone.app :as a]
+            [cybozu-http.kintone.api.app :as a]
             [test-helper :as h]))
 
 (def db (atom {}))

@@ -1,7 +1,7 @@
-(ns cybozu-http.api.kintone.file
+(ns cybozu-http.kintone.api.file
   (:require [cheshire.core :as c]
             [clojure.java.io :as io]
-            [cybozu-http.api.kintone.bare :as bare])
+            [cybozu-http.kintone.api.bare :as bare])
   (:import java.nio.file.attribute.FileAttribute
            java.nio.file.Files))
 

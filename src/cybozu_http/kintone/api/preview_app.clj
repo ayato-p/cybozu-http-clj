@@ -1,5 +1,5 @@
-(ns cybozu-http.api.kintone.preview-app
-  (:require [cybozu-http.api.kintone.bare :refer [defapi]]))
+(ns cybozu-http.kintone.api.preview-app
+  (:require [cybozu-http.kintone.api.bare :refer [defapi]]))
 
 ;;; create app
 ;;; doc https://developer.cybozu.io/hc/ja/articles/204529834
