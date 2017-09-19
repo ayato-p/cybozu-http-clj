@@ -1,4 +1,4 @@
-{$override* "./local-config.edn"
+{$override* "dev-resources/local-config.edn"
  :login-info
  {:subdomain  #env :kintone-subdomain
   :login-name #env :kintone-login-name
