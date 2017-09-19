@@ -10,14 +10,14 @@
                         ["releases" {:url   "https://clojars.org/repo/"
                                      :creds :gpg}]]
 
-  :dependencies [[clj-http "3.5.0"]
-                 [cheshire "5.7.1"]]
+  :dependencies [[clj-http "3.7.0"]
+                 [cheshire "5.8.0"]]
 
   :aliases {"all" ["with-profiles" "+1.8:+1.9"]}
 
   :profiles
   {:dev {:resource-paths ["env/dev/resources"]
-         :dependencies [[org.clojure/clojure "1.8.0"]
-                        [rkworks/baum "0.4.0"]]}
+         :dependencies [[rkworks/baum "0.4.0"]]}
+   :provided {:dependencies [[org.clojure/clojure "1.8.0"]]}
    :1.8 {:dependencies [[org.clojure/clojure "1.8.0"]]}
-   :1.9 {:dependencies [[org.clojure/clojure "1.9.0-alpha17"]]}})
+   :1.9 {:dependencies [[org.clojure/clojure "1.9.0-beta1"]]}})
