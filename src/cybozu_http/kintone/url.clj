@@ -17,7 +17,13 @@
        ")"))
 
 (def re-base-url
-  (re-pattern (str re-base-url* "/?$")))
+  (re-pattern re-base-url*))
+
+(defn extract-base-url [url]
+  (some-> (re-find re-base-url url) first))
+
+(defn valid-base-url? [url]
+  (not (str/blank? (extract-base-url url))))
 
 (def re-url
   (re-pattern (str re-base-url* "/k/(\\d++).*")))
@@ -25,7 +31,7 @@
 (def re-guest-url
   (re-pattern (str re-base-url* "/k/guest/(\\d++)/(\\d++).*")))
 
-(defn parse [url]
+(defn parse-app-url [url]
   (or
    (when-let [[_ subdomain domain app-id] (re-matches re-url url)]
      {:domain domain
@@ -36,3 +42,7 @@
       :subdomain subdomain
       :guest-space-id guest-space-id
       :app-id app-id})))
+
+(defn valid-app-url? [url]
+  (some? (or (re-matches re-url url)
+             (re-matches re-guest-url url))))

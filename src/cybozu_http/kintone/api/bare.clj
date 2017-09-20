@@ -47,7 +47,12 @@
          (throw (ex-info "kintone api error"
                          (-> (c/parse-string body true)
                              (assoc :status status)
-                             (assoc :type :cybozu-http.api.kintone/exception)))))))))
+                             (assoc :type :cybozu-http.kintone.api/exception)))))))))
+
+(defn connection-test
+  ([auth] (connection-test auth "/"))
+  ([auth prefix]
+   (api-call auth :get prefix {:redirect-strategy :none})))
 
 (defmulti build-params (fn [method params] method))
 

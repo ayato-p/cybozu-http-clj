@@ -2,9 +2,9 @@
   (:require [cybozu-http.kintone.url :as sut]
             [clojure.test :as t]))
 
-(t/deftest parse-test
+(t/deftest parse-app-url-test
   (t/testing "parse default space app"
-    (t/are [url parsed] (= (sut/parse url) parsed)
+    (t/are [url parsed] (= (sut/parse-app-url url) parsed)
       "https://foo.cybozu.com/k/1"
       {:subdomain "foo" :domain "cybozu.com" :app-id "1"}
 
@@ -33,7 +33,7 @@
       nil))
 
   (t/testing "parse guest space app"
-    (t/are [url parsed] (= (sut/parse url) parsed)
+    (t/are [url parsed] (= (sut/parse-app-url url) parsed)
       "https://foo.cybozu.com/k/guest/11/1"
       {:subdomain "foo" :domain "cybozu.com" :guest-space-id "11" :app-id "1"}
 
@@ -59,5 +59,4 @@
       {:subdomain "foo99" :domain "cybozu.com" :guest-space-id "11" :app-id "1"}
 
       "https://foo_bar.cybozu.com/k/guest/11/1"
-      nil))
-  )
+      nil)))
