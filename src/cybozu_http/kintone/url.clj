@@ -25,24 +25,28 @@
 (defn valid-base-url? [url]
   (not (str/blank? (extract-base-url url))))
 
-(def re-url
-  (re-pattern (str re-base-url* "/k/(\\d++).*")))
+(def re-app-url
+  (re-pattern (str re-base-url* "/k/(\\d++)")))
 
-(def re-guest-url
-  (re-pattern (str re-base-url* "/k/guest/(\\d++)/(\\d++).*")))
+(def re-guest-app-url
+  (re-pattern (str re-base-url* "/k/guest/(\\d++)/(\\d++)")))
+
+(defn extract-app-url [url]
+  (or (some-> (re-find re-app-url url) first)
+      (some-> (re-find re-guest-app-url url) first)))
 
 (defn parse-app-url [url]
   (or
-   (when-let [[_ subdomain domain app-id] (re-matches re-url url)]
+   (when-let [[_ subdomain domain app-id] (re-find re-app-url url)]
      {:domain domain
       :subdomain subdomain
       :app-id app-id})
-   (when-let [[_ subdomain domain guest-space-id app-id] (re-matches re-guest-url url)]
+   (when-let [[_ subdomain domain guest-space-id app-id] (re-find re-guest-app-url url)]
      {:domain domain
       :subdomain subdomain
       :guest-space-id guest-space-id
       :app-id app-id})))
 
 (defn valid-app-url? [url]
-  (some? (or (re-matches re-url url)
-             (re-matches re-guest-url url))))
+  (some? (or (re-find re-app-url url)
+             (re-find re-guest-app-url url))))

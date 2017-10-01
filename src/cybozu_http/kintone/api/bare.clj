@@ -23,12 +23,20 @@
     (.encodeToString encoder (.getBytes str))))
 
 (defn auth-headers
-  [{:keys [login-name password api-token] :as auth}]
+  [{:keys [basic-login-name basic-password login-name password api-token] :as auth}]
   (cond-> {:headers {}}
+    (and (seq basic-login-name) (seq basic-password))
+    (assoc-in [:headers :Authorization] (str "Basic "(base64-encode (str basic-login-name ":" basic-password))))
     (and (seq login-name) (seq password))
     (assoc-in [:headers :X-Cybozu-Authorization] (base64-encode (str login-name ":" password)))
     (seq api-token)
     (assoc-in [:headers :X-Cybozu-API-Token] api-token)))
+
+(defn- try-json-parse [json]
+  (try
+    (c/parse-string json true)
+    (catch Exception e
+      {:raw json})))
 
 (defn api-call
   ([auth method api-url params]
@@ -45,14 +53,9 @@
        (f url (merge headers params))
        (catch [:type :clj-http.client/unexceptional-status] {:keys [status body]}
          (throw (ex-info "kintone api error"
-                         (-> (c/parse-string body true)
+                         (-> (try-json-parse body)
                              (assoc :status status)
                              (assoc :type :cybozu-http.kintone.api/exception)))))))))
-
-(defn connection-test
-  ([auth] (connection-test auth "/"))
-  ([auth prefix]
-   (api-call auth :get prefix {:redirect-strategy :none})))
 
 (defmulti build-params (fn [method params] method))
 
