@@ -9,8 +9,9 @@
    "cybozu.cn"
    "cybozu-dev.cn"])
 
+
 (def re-base-url*
-  (str "^https://([a-z0-9][a-z0-9\\-]{1,30}[a-z0-9])(?:\\.s)?\\."
+  (str "^https://([a-zA-Z0-9][a-zA-Z0-9\\-]{1,30}[a-zA-Z0-9])(?:\\.s)?\\."
        "("
        (->> (map #(str/replace % "." "\\.") domain-list)
             (str/join "|"))
