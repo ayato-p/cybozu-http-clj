@@ -22,6 +22,7 @@
       (c/parse-string true)
       :fileKey))
 
-(defn download* [auth file-key & {:as opts}]
-  (let [params (bare/build-params :get {:fileKey file-key})]
+(defn download* [auth file-key & {:keys [as-byte-array?] :as opts}]
+  (let [params (cond-> (bare/build-params :get {:fileKey file-key})
+                 as-byte-array? (assoc :as :byte-array))]
     (bare/api-call auth :get "/file.json" params)))
