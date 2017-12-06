@@ -23,6 +23,11 @@
 (defn extract-base-url [url]
   (some-> (re-find re-base-url url) first))
 
+(defn parse-base-url [url]
+  (when-let [[_ subdomain domain] (re-find re-base-url url)]
+    {:domain domain
+     :subdomain subdomain}))
+
 (defn valid-base-url? [url]
   (not (str/blank? (extract-base-url url))))
 
