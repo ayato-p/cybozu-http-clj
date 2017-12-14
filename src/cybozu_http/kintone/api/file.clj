@@ -14,7 +14,7 @@
 (defn upload* [auth file & {:keys [filename] :as opts}]
   (let [file (cond-> file (seq filename) (rename-file filename))
         params {:multipart [{:name "file" :content file}]}]
-    (bare/api-call auth :post "/file.json" params)))
+    (bare/api-call auth :post "/file.json" params opts)))
 
 (defn upload [auth file & {:keys [filename]}]
   (-> (upload* auth file :filename filename)
@@ -25,4 +25,4 @@
 (defn download* [auth file-key & {:keys [as-byte-array?] :as opts}]
   (let [params (cond-> (bare/build-params :get {:fileKey file-key})
                  as-byte-array? (assoc :as :byte-array))]
-    (bare/api-call auth :get "/file.json" params)))
+    (bare/api-call auth :get "/file.json" params opts)))
