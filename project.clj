@@ -20,4 +20,4 @@
          :dependencies [[rkworks/baum "0.4.0"]]}
    :provided {:dependencies [[org.clojure/clojure "1.8.0"]]}
    :1.8 {:dependencies [[org.clojure/clojure "1.8.0"]]}
-   :1.9 {:dependencies [[org.clojure/clojure "1.9.0-beta1"]]}})
+   :1.9 {:dependencies [[org.clojure/clojure "1.9.0"]]}})
