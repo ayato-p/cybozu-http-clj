@@ -1,24 +1,40 @@
 (ns cybozu-http.kintone.api.records
   (:refer-clojure :exclude [get])
-  (:require [cybozu-http.kintone.api.bare :refer [defapi]]))
+  (:require [cybozu-http.kintone.api.internal.records :as internal]))
 
-(defapi get :get "/records.json"
-  [app :- app-id]
-  [fields     :- fields
-   query      :- query
-   totalCount :- total-count])
+(defprotocol RecordsAPI
+  (get
+    [auth app-id]
+    [auth app-id  opts])
+  (post
+    [auth app-id records]
+    [auth app-id records opts])
+  (put
+    [auth app-id records]
+    [auth app-id records opts])
+  (delete
+    [auth app-id record-ids]
+    [auth app-id record-ids opts]))
 
-(defapi post :post "/records.json"
-  [app     :- app-id
-   records :- records])
-
-(defapi put :put "/records.json"
-  [app     :- app-id
-   records :- records]
-  []
-  [:records])
-
-(defapi delete :delete "/records.json"
-  [app :- app-id
-   ids :- record-ids]
-  [revisions :- revisions])
+(extend-protocol RecordsAPI
+  clojure.lang.IPersistentMap
+  (get
+    ([auth app-id]
+     (internal/get auth app-id))
+    ([auth app-id  opts]
+     (internal/get auth app-id opts)))
+  (post
+    ([auth app-id records]
+     (internal/post auth app-id records))
+    ([auth app-id records opts]
+     (internal/post auth app-id records opts)))
+  (put
+    ([auth app-id records]
+     (internal/put auth app-id records))
+    ([auth app-id records opts]
+     (internal/put auth app-id records opts)))
+  (delete
+    ([auth app-id record-ids]
+     (internal/delete auth app-id record-ids))
+    ([auth app-id record-ids opts]
+     (internal/delete auth app-id record-ids opts))))

@@ -1,4 +1,4 @@
-(ns cybozu-http.kintone.api.bare
+(ns cybozu-http.kintone.api.internal.bare
   (:require [cheshire.core :as c]
             [clj-http.client :as cli]
             [slingshot.slingshot :refer [try+]])

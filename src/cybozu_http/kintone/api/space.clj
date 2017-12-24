@@ -1,37 +1,70 @@
 (ns cybozu-http.kintone.api.space
   (:refer-clojure :exclude [get])
-  (:require [cybozu-http.kintone.api.bare :refer [defapi]]))
+  (:require [cybozu-http.kintone.api.internal.space :as internal]))
 
-(defapi post :post "/template/space.json"
-  [id      :- template-id
-   name    :- name
-   members :- members]
-  [isPrivate   :- private?
-   isGuest     :- guest?
-   fixedMember "-" fixed-member]
-  [:id])
+(defprotocol SpaceAPI
+  (post
+    [auth template-id name members]
+    [auth template-id name members opts])
+  (get
+    [auth space-id]
+    [auth space-id opts])
+  (delete
+    [auth space-id]
+    [auth space-id opts])
+  (put-body
+    [auth space-id body]
+    [auth space-id body opts]))
 
-(def space-url "/space.json")
+(extend-protocol SpaceAPI
+  clojure.lang.IPersistentMap
+  (post
+    ([auth template-id name members]
+     (internal/post auth template-id name members))
+    ([auth template-id name members opts]
+     (internal/post auth template-id name members opts)))
+  (get
+    ([auth space-id]
+     (internal/get auth space-id))
+    ([auth space-id opts]
+     (internal/get auth space-id opts)))
+  (delete
+    ([auth space-id]
+     (internal/delete auth space-id))
+    ([auth space-id opts]
+     (internal/delete auth space-id opts)))
+  (put-body
+    ([auth space-id body]
+     (internal/put-body auth space-id body))
+    ([auth space-id body opts]
+     (internal/put-body auth space-id body opts))))
 
-(defapi get :get space-url
-  [id :- space-id])
 
-(defapi delete :delete space-url
-  [id :- space-id])
+(defprotocol SpaceMemberAPI
+  (put-members
+    [auth space-id members]
+    [auth space-id members opts])
+  (get-members
+    [auth space-id]
+    [auth space-id opts])
+  (put-guests
+    [auth guest-space-id guests]
+    [auth guest-space-id guests opts]))
 
-(defapi put-body :put "/space/body.json"
-  [id   :- space-id
-   body :- body])
-
-(defapi get-members :get "/space/members.json"
-  [id :- space-id]
-  []
-  [:members])
-
-(defapi put-members :put "/space/members.json"
-  [id      :- space-id
-   members :- members])
-
-(defapi put-guests :put "/space/guests.json"
-  [id     :- guest-space-id
-   guests :- guests])
+(extend-protocol SpaceMemberAPI
+  clojure.lang.IPersistentMap
+  (get-members
+    ([auth space-id]
+     (internal/get-members auth space-id))
+    ([auth space-id opts]
+     (internal/get-members auth space-id opts)))
+  (put-members
+    ([auth space-id members]
+     (internal/put-members auth space-id members))
+    ([auth space-id members opts]
+     (internal/put-members auth space-id members opts)))
+  (put-guests
+    ([auth guest-space-id guests]
+     (internal/put-guests auth guest-space-id guests))
+    ([auth guest-space-id guests opts]
+     (internal/put-guests auth guest-space-id guests opts))))

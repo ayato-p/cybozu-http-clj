@@ -1,12 +1,23 @@
 (ns cybozu-http.kintone.api.thread
-  (:require [cybozu-http.kintone.api.bare :refer [defapi]]))
+  (:require [cybozu-http.kintone.api.internal.thread :as internal]))
 
-(defapi put :put "/space/thread.json"
-  [id :- thread-id]
-  [name :- name
-   body :- body])
+(defprotocol ThreadAPI
+  (put
+    [auth thread-id]
+    [auth thread-id opts])
+  (post-comment
+    [auth space-id thread-id comment]
+    [auth space-id thread-id comment opts]))
 
-(defapi post-comment :post "/space/thread/comment.json"
-  [space   :- space-id
-   thread  :- thread-id
-   comment :- comment])
+(extend-protocol ThreadAPI
+  clojure.lang.IPersistentMap
+  (put
+    ([auth thread-id]
+     (internal/put auth thread-id))
+    ([auth thread-id opts]
+     (internal/put auth thread-id opts)))
+  (post-comment
+    ([auth space-id thread-id comment]
+     (internal/post-comment auth space-id thread-id comment))
+    ([auth space-id thread-id comment opts]
+     (internal/post-comment auth space-id thread-id comment opts))))
