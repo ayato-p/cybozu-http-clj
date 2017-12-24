@@ -1,20 +1,55 @@
 (ns cybozu-http.kintone.api.app
   (:refer-clojure :exclude [get])
-  (:require [cybozu-http.kintone.api.bare :refer [defapi]]))
+  (:require [cybozu-http.kintone.api.internal.app :as internal]))
 
-(defapi get :get "/app.json"
-  [id :- app-id])
+(defprotocol AppAPI
+  (get
+    [auth app-id]
+    [auth app-id opts]))
 
-(defapi get-form :get "/form.json"
-  [app :- app-id])
+(extend-protocol AppAPI
+  clojure.lang.IPersistentMap
+  (get
+    ([auth app-id]
+     (internal/get auth app-id))
+    ([auth app-id opts]
+     (internal/get auth app-id opts))))
 
-;;; form configurations
-;;; doc: https://developer.cybozu.io/hc/ja/articles/204783170
-;;;      https://developer.cybozu.io/hc/ja/articles/204529724
+(defprotocol AppFormAPI
+  (get-form
+    [auth app-id]
+    [auth app-id opts]))
 
-(defapi get-fields :get "/app/form/fields.json"
-  [app :- app-id]
-  [lang :- language])
+(extend-protocol AppFormAPI
+  clojure.lang.IPersistentMap
+  (get-form
+    ([auth app-id]
+     (internal/get-form auth app-id))
+    ([auth app-id opts]
+     (internal/get-form auth app-id opts))))
 
-(defapi get-layout :get "/app/form/layout.json"
-  [app    :- app-id])
+(defprotocol AppFieldsAPI
+  (get-fields
+    [auth app-id]
+    [auth app-id opts]))
+
+(extend-protocol AppFieldsAPI
+  clojure.lang.IPersistentMap
+  (get-fields
+    ([auth app-id]
+     (internal/get-fields auth app-id))
+    ([auth app-id opts]
+     (internal/get-fields auth app-id opts))))
+
+(defprotocol AppLayoutAPI
+  (get-layout
+    [auth app-id]
+    [auth app-id opts]))
+
+(extend-protocol AppLayoutAPI
+  clojure.lang.IPersistentMap
+  (get-layout
+    ([auth app-id]
+     (internal/get-layout auth app-id))
+    ([auth app-id opts]
+     (internal/get-layout auth app-id opts))))

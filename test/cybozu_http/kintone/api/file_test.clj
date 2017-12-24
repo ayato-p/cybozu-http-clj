@@ -23,12 +23,12 @@
                       (r/post auth app-id))
         res (r/get auth app-id id)
         file-key (get-in res [:attachment_file :value 0 :fileKey])
-        download-res (f/download* auth file-key)]
+        download-res (f/download auth file-key)]
     (t/testing "file upload test"
       (t/is (string? upload-res))
       (t/is (string? (:body download-res)))
       (t/is (= (:body download-res) (slurp file))))
 
     (t/testing "download as byte-array test"
-      (let [download-res (f/download* auth file-key :as-byte-array? true)]
+      (let [download-res (f/download auth file-key {:as-byte-array? true})]
         (t/is (byte-array? (:body download-res)))))))

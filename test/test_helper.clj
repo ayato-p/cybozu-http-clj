@@ -1,8 +1,8 @@
 (ns test-helper
   (:require [baum.core :as b]
             [clojure.java.io :as io]
-            [cybozu-http.kintone.api.preview-app :as preview-app]
-            [cybozu-http.kintone.api.space :as space]))
+            [cybozu-http.kintone.api.space :as space]
+            [cybozu-http.kintone.api.preview-app :as preview-app]))
 
 (defn read-config-file* []
   (b/read-file (io/resource "config.edn")))

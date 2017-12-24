@@ -1,177 +1,216 @@
 (ns cybozu-http.kintone.api.preview-app
-  (:require [cybozu-http.kintone.api.bare :refer [defapi]]))
+  (:require [cybozu-http.kintone.api.internal.preview-app :as internal]))
 
-;;; create app
-;;; doc https://developer.cybozu.io/hc/ja/articles/204529834
+(defprotocol PreviewAppAPI
+  (create
+    [auth name]
+    [auth name opts])
+  (get-customize
+    [auth app-id]
+    [auth app-id opts])
+  (put-customize
+    [auth app-id]
+    [auth app-id opts])
+  (get-status
+    [auth app-id]
+    [auth app-id opts])
+  (put-status
+    [auth app-id]
+    [auth app-id opts]))
 
-(defapi create :post "/preview/app.json"
-  [name :- name]
-  [space  :- space-id
-   thread :- thread-id])
+(extend-protocol PreviewAppAPI
+  clojure.lang.IPersistentMap
+  (create
+    ([auth name]
+     (internal/create auth name))
+    ([auth name opts]
+     (internal/create auth name opts)))
+  (get-customize
+    ([auth app-id]
+     (internal/get-customize auth app-id))
+    ([auth app-id opts]
+     (internal/get-customize auth app-id opts)))
+  (put-customize
+    ([auth app-id]
+     (internal/put-customize auth app-id))
+    ([auth app-id opts]
+     (internal/put-customize auth app-id opts)))
+  (get-status
+    ([auth app-id]
+     (internal/get-status auth app-id))
+    ([auth app-id opts]
+     (internal/get-status auth app-id opts)))
+  (put-status
+    ([auth app-id]
+     (internal/put-status auth app-id))
+    ([auth app-id opts]
+     (internal/put-status auth app-id opts))))
 
-;;; deploy app
-;;; doc https://developer.cybozu.io/hc/ja/articles/204699420
-;;;     https://developer.cybozu.io/hc/ja/articles/210100886
+(defprotocol DeployAPI
+  (deploy-apps
+    [auth apps]
+    [auth apps opts])
+  (deploy
+    [auth app-id]
+    [auth app-id opts])
+  (get-deploy-statuses
+    [auth app-ids]
+    [auth app-ids opts])
+  (get-deploy-status
+    [auth app-id]))
 
-(def deploy-url "/preview/app/deploy.json")
+(extend-protocol DeployAPI
+  clojure.lang.IPersistentMap
+  (create
+    ([auth name]
+     (internal/create auth name))
+    ([auth name opts]
+     (internal/create auth name opts)))
+  (deploy-apps
+    ([auth apps]
+     (internal/deploy-apps auth apps))
+    ([auth apps opts]
+     (internal/deploy-apps auth apps opts)))
+  (deploy
+    ([auth app-id]
+     (internal/deploy auth app-id))
+    ([auth app-id opts]
+     (->> (reduce into [] opts)
+          (apply internal/deploy auth app-id))))
+  (get-deploy-statuses
+    ([auth app-ids]
+     (internal/get-deploy-statuses auth app-ids))
+    ([auth app-ids opts]
+     (internal/get-deploy-statuses auth app-ids opts)))
+  (get-deploy-status
+    ([auth app-id]
+     (internal/get-deploy-status auth app-id))))
 
-(defapi deploy-apps :post deploy-url
-  [apps :- apps]
-  [revert :- revert])
+(defprotocol SettingAPI
+  (get-settings [auth app-id] [auth app-id opts])
+  (put-settings [auth app-id] [auth app-id opts]))
 
-(defn deploy [auth app-id & {:keys [revert] :as opts}]
-  (deploy-apps auth [{:app app-id}] opts))
+(extend-protocol SettingAPI
+  clojure.lang.IPersistentMap
+  (get-settings
+    ([auth app-id]
+     (internal/get-settings auth app-id))
+    ([auth app-id opts]
+     (internal/get-settings auth app-id opts)))
+  (put-settings
+    ([auth app-id]
+     (internal/put-settings auth app-id))
+    ([auth app-id opts]
+     (internal/put-settings auth app-id opts))))
 
-(defapi get-deploy-statuses :get deploy-url
-  [apps :- app-ids]
-  []
-  [:apps])
+(defprotocol FieldAPI
+  (get-fields
+    [auth app-id]
+    [auth app-id opts])
+  (post-fields
+    [auth app-id fields]
+    [auth app-id fields opts])
+  (put-fields
+    [auth app-id fields]
+    [auth app-id fields opts])
+  (delete-fields
+    [auth app-id field-codes]
+    [auth app-id field-codes opts]))
 
-(defn get-deploy-status [auth app-id]
-  (-> (get-deploy-statuses auth [app-id])
-      first))
+(extend-protocol FieldAPI
+  clojure.lang.IPersistentMap
+  (get-fields
+    ([auth app-id]
+     (internal/get-fields auth app-id))
+    ([auth app-id opts]
+     (internal/get-fields auth app-id opts)))
+  (post-fields
+    ([auth app-id fields]
+     (internal/post-fields auth app-id fields))
+    ([auth app-id fields opts]
+     (internal/post-fields auth app-id fields opts)))
+  (put-fields
+    ([auth app-id fields]
+     (internal/put-fields auth app-id fields))
+    ([auth app-id fields opts]
+     (internal/put-fields auth app-id fields opts)))
+  (delete-fields
+    ([auth app-id field-codes]
+     (internal/delete-fields auth app-id field-codes))
+    ([auth app-id field-codes opts]
+     (internal/delete-fields auth app-id field-codes opts))))
 
-;;; general configurations
-;;; doc https://developer.cybozu.io/hc/ja/articles/204694170
-;;;     https://developer.cybozu.io/hc/ja/articles/204730520
+(defprotocol LayoutAPI
+  (get-layout [auth app-id] [auth app-id opts])
+  (put-layout [auth app-id layout] [auth app-id layout opts]))
 
-(def settings-url "/preview/app/settings.json")
+(extend-protocol LayoutAPI
+  clojure.lang.IPersistentMap
+  (get-layout
+    ([auth app-id]
+     (internal/get-layout auth app-id))
+    ([auth app-id opts]
+     (internal/get-layout auth app-id opts)))
+  (put-layout
+    ([auth app-id layout]
+     (internal/put-layout auth app-id layout))
+    ([auth app-id layout opts]
+     (internal/put-layout auth app-id layout opts))))
 
-(defapi get-settings :get settings-url
-  [app :- app-id]
-  [lang :- language])
+(defprotocol ViewAPI
+  (get-views [auth app-id] [auth app-id opts])
+  (put-views [auth app-id views] [auth app-id views opts]))
 
-(defapi put-settings :put settings-url
-  [app :- app-id]
-  [name        :- name
-   description :- description
-   icon        :- icon
-   theme       :- theme
-   revision    :- revision])
+(extend-protocol ViewAPI
+  clojure.lang.IPersistentMap
+  (get-views
+    ([auth app-id]
+     (internal/get-views auth app-id))
+    ([auth app-id opts]
+     (internal/get-views auth app-id opts)))
+  (put-views
+    ([auth app-id views]
+     (internal/put-views auth app-id views))
+    ([auth app-id views opts]
+     (internal/put-views auth app-id views opts))))
 
-;;; form configurations
-;;; doc: https://developer.cybozu.io/hc/ja/articles/204783170
-;;;      https://developer.cybozu.io/hc/ja/articles/204529724
+(defprotocol AclAPI
+  (get-acl [auth app-id] [auth app-id opts])
+  (put-acl [auth app-id rights] [auth app-id rights opts])
+  (get-record-acl [auth app-id] [auth app-id opts])
+  (put-record-acl [auth app-id rights] [auth app-id rights opts])
+  (get-field-acl [auth app-id] [auth app-id opts])
+  (put-field-acl [auth app-id rights] [auth app-id rights opts]))
 
-(def fields-url "/preview/app/form/fields.json")
-
-(defapi get-fields :get fields-url
-  [app :- app-id]
-  [lang :- language])
-
-(defapi post-fields :post fields-url
-  [app        :- app-id
-   properties :- fields]
-  [revision :- revision])
-
-(defapi put-fields :put fields-url
-  [app        :- app-id
-   properties :- fields]
-  [revision :- revision])
-
-(defapi delete-fields :delete fields-url
-  [app    :- app-id
-   fields :- field-codes]
-  [revision :- revision])
-
-(def layout-url "/preview/app/form/layout.json")
-
-(defapi get-layout :get layout-url
-  [app    :- app-id])
-
-(defapi put-layout :put layout-url
-  [app    :- app-id
-   layout :- layout]
-  [revision :- revision])
-
-;;; view configurations
-;;; doc https://developer.cybozu.io/hc/ja/articles/204529784
-;;;     https://developer.cybozu.io/hc/ja/articles/204529794
-
-(def views-url "/preview/app/views.json")
-
-(defapi get-views :get views-url
-  [app :- app-id]
-  [lang :- language])
-
-(defapi put-views :put views-url
-  [app   :- app-id
-   views :- views]
-  [revision :- revision])
-
-;;; access control list configurations
-;;; doc https://developer.cybozu.io/hc/ja/articles/204529754
-;;;     https://developer.cybozu.io/hc/ja/articles/201941854
-
-(def acl-url "/preview/app/acl.json")
-
-(defapi get-acl :get acl-url
-  [app :- app-id])
-
-(defapi put-acl :put acl-url
-  [app    :- app-id
-   rights :- rights]
-  [revision :- revision])
-
-;;; record access control list configurations
-;;; doc https://developer.cybozu.io/hc/ja/articles/204791510
-;;;     https://developer.cybozu.io/hc/ja/articles/201941854
-
-(def record-acl-url "/preview/record/acl.json")
-
-(defapi get-record-acl :get record-acl-url
-  [app :- app-id]
-  [lang :- language])
-
-(defapi put-record-acl :put record-acl-url
-  [app    :- app-id
-   rights :- rights]
-  [revision :- revision])
-
-;;; field access control list configurations
-;;; doc https://developer.cybozu.io/hc/ja/articles/204791520
-;;;     https://developer.cybozu.io/hc/ja/articles/201941864
-
-(def field-acl-url "/preview/field/acl.json")
-
-(defapi get-field-acl :get field-acl-url
-  [app :- app-id])
-
-(defapi put-field-acl :put field-acl-url
-  [app    :- app-id
-   rights :- rights]
-  [revision :- revision])
-
-
-;;; customize configurations
-;;; doc https://developer.cybozu.io/hc/ja/articles/204529824
-;;;     https://developer.cybozu.io/hc/ja/articles/204529834
-
-(def customize-url "/preview/app/customize.json")
-
-(defapi get-customize :get customize-url
-  [app :- app-id])
-
-(defapi put-customize :put customize-url
-  [app :- app-id]
-  [scope    :- scope
-   desktop  :- desctop-customize
-   mobile   :- mobile-customize
-   revision :- revision])
-
-;;; process management configurations
-;;; doc https://developer.cybozu.io/hc/ja/articles/216972946
-;;;
-
-(def status-url "/preview/app/status.json")
-
-(defapi get-status :get status-url
-  [app :- app-id]
-  [lang :- language])
-
-(defapi put-status :put status-url
-  [app :- app-id]
-  [enable :- enable?
-   status   :- status
-   actions  :- actions
-   revision :- revision])
+(extend-protocol AclAPI
+  clojure.lang.IPersistentMap
+  (get-acl
+    ([auth app-id]
+     (internal/get-acl auth app-id))
+    ([auth app-id opts]
+     (internal/get-acl auth app-id opts)))
+  (put-acl
+    ([auth app-id rights]
+     (internal/put-acl auth app-id rights))
+    ([auth app-id rights opts]
+     (internal/put-acl auth app-id rights opts)))
+  (get-record-acl
+    ([auth app-id]
+     (internal/get-record-acl auth app-id))
+    ([auth app-id opts]
+     (internal/get-record-acl auth app-id opts)))
+  (put-record-acl
+    ([auth app-id rights]
+     (internal/put-record-acl auth app-id rights))
+    ([auth app-id rights opts]
+     (internal/put-record-acl auth app-id rights opts)))
+  (get-field-acl
+    ([auth app-id]
+     (internal/get-field-acl auth app-id))
+    ([auth app-id opts]
+     (internal/get-field-acl auth app-id opts)))
+  (put-field-acl
+    ([auth app-id rights]
+     (internal/put-field-acl auth app-id rights))
+    ([auth app-id rights opts]
+     (internal/put-field-acl auth app-id rights opts))))

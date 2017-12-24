@@ -1,13 +1,14 @@
 (ns cybozu-http.kintone.api.apps
   (:refer-clojure :exclude [get])
-  (:require [cybozu-http.kintone.api.bare :refer [defapi]]))
+  (:require [cybozu-http.kintone.api.internal.apps :as internal]))
 
-(defapi get :get "/apps.json"
-  []
-  [ids      :- app-ids
-   codes    :- app-codes
-   name     :- name
-   spaceIds :- space-ids
-   limit    :- limit
-   offset   :- offset]
-  [:apps])
+(defprotocol AppsAPI
+  (get [auth] [auth opts]))
+
+(extend-protocol AppsAPI
+  clojure.lang.IPersistentMap
+  (get
+    ([auth]
+     (internal/get auth))
+    ([auth opts]
+     (internal/get auth opts))))

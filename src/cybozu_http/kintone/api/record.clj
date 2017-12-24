@@ -1,50 +1,82 @@
 (ns cybozu-http.kintone.api.record
   (:refer-clojure :exclude [get])
-  (:require [cybozu-http.kintone.api.bare :refer [defapi]]))
+  (:require [cybozu-http.kintone.api.internal.record :as internal]))
 
-(defapi get :get "/record.json"
-  [app :- app-id
-   id  :- id]
-  []
-  [:record])
+(defprotocol RecordAPI
+  (get
+    [auth app-id id]
+    [auth app-id id opts])
+  (post
+    [auth app-id]
+    [auth app-id opts])
+  (put
+    [auth app-id]
+    [auth app-id opts]))
 
-(defapi post :post "/record.json"
-  [app :- app-id]
-  [record :- record])
+(extend-protocol RecordAPI
+  clojure.lang.IPersistentMap
+  (get
+    ([auth app-id id]
+     (internal/get auth app-id id))
+    ([auth app-id id opts]
+     (internal/get auth app-id id opts)))
+  (post
+    ([auth app-id]
+     (internal/post auth app-id))
+    ([auth app-id opts]
+     (internal/post auth app-id opts)))
+  (put
+    ([auth app-id]
+     (internal/put auth app-id))
+    ([auth app-id opts]
+     (internal/put auth app-id opts))))
 
-(defapi put :put "/record.json"
-  [app :- app-id]
-  [id        :- id
-   updateKey :- update-key
-   record    :- record
-   revision  :- revision])
+(defprotocol RecordProcessAPI
+  (put-assignees
+    [auth app-id record-id assignees]
+    [auth app-id record-id assignees opts])
+  (put-status
+    [auth app-id record-id action]
+    [auth app-id record-id action opts]))
 
-(defapi put-assignees :put "/record/assignees.json"
-  [app       :- app-id
-   id        :- record-id
-   assignees :- assignees]
-  [revision :- revision])
+(extend-protocol RecordProcessAPI
+  clojure.lang.IPersistentMap
+  (put-assignees
+    ([auth app-id record-id assignees]
+     (internal/put-assignees auth app-id record-id assignees))
+    ([auth app-id record-id assignees opts]
+     (internal/put-assignees auth app-id record-id assignees opts)))
+  (put-status
+    ([auth app-id record-id action]
+     (internal/put-status auth app-id record-id action))
+    ([auth app-id record-id action opts]
+     (internal/put-status auth app-id record-id action opts))))
 
-(defapi put-status :put "/record/status.json"
-  [app    :- app-id
-   id     :- record-id
-   action :- action]
-  [assignee revision])
+(defprotocol RecordCommentAPI
+  (get-comments
+    [auth app-id record-id]
+    [auth app-id record-id opts])
+  (post-comment
+    [auth app-id record-id comment]
+    [auth app-id record-id comment opts])
+  (delete-comment
+    [auth app-id record-id comment-id]
+    [auth app-id record-id comment-id opts]))
 
-(defapi get-comments :get "/record/comments.json"
-  [app    :- app-id
-   record :- record-id]
-  [order  :- order
-   offset :- offset
-   limit  :- limit]
-  [:comments])
-
-(defapi post-comment :post "/record/comment.json"
-  [app     :- app-id
-   record  :- record-id
-   comment :- comment])
-
-(defapi delete-comment :delete "/record/comment.json"
-  [app     :- app-id
-   record  :- record-id
-   comment :- comment-id])
+(extend-protocol RecordCommentAPI
+  clojure.lang.IPersistentMap
+  (get-comments
+    ([auth app-id record-id]
+     (internal/get-comments auth app-id record-id))
+    ([auth app-id record-id opts]
+     (internal/get-comments auth app-id record-id opts)))
+  (post-comment
+    ([auth app-id record-id comment]
+     (internal/post-comment auth app-id record-id comment))
+    ([auth app-id record-id comment opts]
+     (internal/post-comment auth app-id record-id comment opts)))
+  (delete-comment
+    ([auth app-id record-id comment-id]
+     (internal/delete-comment auth app-id record-id comment-id))
+    ([auth app-id record-id comment-id opts]
+     (internal/delete-comment auth app-id record-id comment-id opts))))

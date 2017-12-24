@@ -1,8 +1,23 @@
 (ns cybozu-http.kintone.api.guests
-  (:require [cybozu-http.kintone.api.bare :refer [defapi]]))
+  (:require [cybozu-http.kintone.api.internal.guests :as internal]))
 
-(defapi post :post "/guests.json"
-  [guests :- guests])
+(defprotocol GuestsAPI
+  (post
+    [auth guests]
+    [auth guests opts])
+  (delete
+    [auth guests]
+    [auth guests opts]))
 
-(defapi delete :delete "/guests.json"
-  [guests :- guests])
+(extend-protocol GuestsAPI
+  clojure.lang.IPersistentMap
+  (post
+    ([auth guests]
+     (internal/post auth guests))
+    ([auth guests opts]
+     (internal/post auth guests opts)))
+  (delete
+    ([auth guests]
+     (internal/delete auth guests))
+    ([auth guests opts]
+     (internal/delete auth guests opts))))
