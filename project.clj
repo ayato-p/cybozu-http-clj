@@ -1,4 +1,4 @@
-(defproject ayato_p/cybozu-http "0.1.0-SNAPSHOT"
+(defproject ayato_p/cybozu-http "0.1.0"
   :description "Cybozu HTTP client for Clojure"
   :url "https://github.com/ayato-p/cybozu-http-clj"
   :license {:name "The MIT License"
