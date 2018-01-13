@@ -1,4 +1,4 @@
-(ns test-helper
+(ns cybozu-http.test-helper
   (:require [baum.core :as b]
             [clojure.java.io :as io]
             [cybozu-http.kintone.api.space :as space]

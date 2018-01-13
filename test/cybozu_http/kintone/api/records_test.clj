@@ -1,7 +1,7 @@
 (ns cybozu-http.kintone.api.records-test
   (:require [clojure.test :as t]
             [cybozu-http.kintone.api.records :as r]
-            [test-helper :as h]))
+            [cybozu-http.test-helper :as h]))
 
 (def db (atom {}))
 

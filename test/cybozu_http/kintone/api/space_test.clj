@@ -2,7 +2,7 @@
   (:require [clojure.set :as set]
             [clojure.test :as t]
             [cybozu-http.kintone.api.space :as s]
-            [test-helper :as h]))
+            [cybozu-http.test-helper :as h]))
 
 (def db (atom {}))
 

@@ -3,7 +3,7 @@
             [clojure.test :as t]
             [cybozu-http.kintone.api.file :as f]
             [cybozu-http.kintone.api.preview-app :as p]
-            [test-helper :as h]))
+            [cybozu-http.test-helper :as h]))
 
 (def db (atom {}))
 

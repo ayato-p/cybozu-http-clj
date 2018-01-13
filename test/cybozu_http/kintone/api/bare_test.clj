@@ -1,7 +1,7 @@
 (ns cybozu-http.kintone.api.bare-test
   (:require [clojure.test :as t]
             [cybozu-http.kintone.api.internal.bare :as b]
-            [test-helper :as h]))
+            [cybozu-http.test-helper :as h]))
 
 (t/deftest generate-url-test
   (t/is (= (b/generate-url {:subdomain "acme"} "/foo.json" nil)
