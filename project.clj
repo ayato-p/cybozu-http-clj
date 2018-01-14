@@ -17,7 +17,9 @@
 
   :profiles
   {:dev {:resource-paths ["env/dev/resources"]
-         :dependencies [[rkworks/baum "0.4.0"]]}
-   :provided {:dependencies [[org.clojure/clojure "1.8.0"]]}
+         :dependencies [[rkworks/baum "0.4.0"]
+                        [com.stuartsierra/component "0.3.2"]
+                        [org.clojure/core.async "0.4.474"]]}
+   :provided {:dependencies [[org.clojure/clojure "1.9.0"]]}
    :1.8 {:dependencies [[org.clojure/clojure "1.8.0"]]}
    :1.9 {:dependencies [[org.clojure/clojure "1.9.0"]]}})
