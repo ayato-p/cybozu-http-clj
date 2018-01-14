@@ -1,4 +1,4 @@
-(ns cybozu-http.kintone.api.space-test
+(ns ^:eftest/synchronized cybozu-http.kintone.api.space-test
   (:require [clojure.set :as set]
             [clojure.test :as t]
             [cybozu-http.kintone.api.space :as s]

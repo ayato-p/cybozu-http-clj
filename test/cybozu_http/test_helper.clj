@@ -5,7 +5,8 @@
             [com.stuartsierra.component :as c]
             [cybozu-http.kintone.api.app :as app]
             [cybozu-http.kintone.api.preview-app :as preview-app]
-            [cybozu-http.kintone.api.space :as space]))
+            [cybozu-http.kintone.api.space :as space]
+            [diehard.core :as diehard]))
 
 (defn read-config-file* []
   (b/read-file (io/resource "config.edn")))
@@ -250,11 +251,17 @@
   (space/delete (:auth @db) (:space-id @db))
   (reset! db {}))
 
+(diehard/defretrypolicy policy
+  {:max-retries 3
+   :delay-ms 3000})
+
 (defn wrap-setup [db]
   (fn [f]
-    (setup db)
+    (diehard/with-retry {:policy policy}
+      (setup db))
     (f)
-    (teardown db)))
+    (diehard/with-retry {:policy policy}
+      (teardown db))))
 
 (defrecord KintoneTestSpace [auth space]
   c/Lifecycle
@@ -265,15 +272,15 @@
                       :isAdmin true}]]
         (let [space-id (space/post auth template-id "cybozu-http test space" members)
               space (space/get auth space-id)]
-          (assoc this :space-id space-id :detail space)))
+          (assoc this :space-id space-id :thread-id (:defaultThread space) :detail space)))
       this))
   (stop [this]
     (when (:space-id this)
       (space/delete auth (:space-id this)))
     (dissoc this :space-id)))
 
-(defn new-kintone-test-space [auth space]
-  (map->KintoneTestSpace {:auth auth :space space}))
+(defn new-kintone-test-space [space]
+  (map->KintoneTestSpace {:space space}))
 
 (defrecord KintoneTestApp [auth space]
   c/Lifecycle
@@ -297,15 +304,18 @@
     ;; Can't delete app by API
     this))
 
-(defn new-kintone-test-app [auth]
-  (map->KintoneTestApp {:auth auth}))
+(defn new-kintone-test-app []
+  (map->KintoneTestApp {}))
 
 (defn new-kintone-system []
   (let [{:keys [login-info space]} (read-config-file)]
     (-> (c/system-map
-         :space (new-kintone-test-space login-info space)
-         :app (new-kintone-test-app login-info))
-        (c/system-using {:app [:space]}))))
+         :auth login-info
+         :space (new-kintone-test-space space)
+         :app (new-kintone-test-app))
+        (c/system-using
+         {:app [:auth :space]
+          :space [:auth]}))))
 
 (defonce system-request-channel (async/chan))
 
@@ -322,7 +332,7 @@
     {:systems systems
      :many-to-many-ch
      (async/go-loop []
-       (let [{:keys [op uuid]} (async/<! system-request-channel)]
+       (let [{:keys [op uuid] :as req} (async/<! system-request-channel)]
          (case op
            :create
            (let [system (try
@@ -333,9 +343,10 @@
                   (async/>! system-deliver-channel)))
            :destroy
            (try
-             (when-let [system (get @systems uuid)]
-               (c/stop-system system)
-               (swap! systems dissoc uuid))
+             (diehard/with-retry {:policy policy}
+               (when-let [system (get @systems uuid)]
+                 (c/stop-system system)
+                 (swap! systems dissoc uuid)))
              (catch Exception e)))
          (recur)))}))
 
@@ -349,3 +360,10 @@
          ~@body)
        (finally
          (async/put! system-request-channel {:uuid uuid# :op :destroy})))))
+
+(comment
+  (let [auth (:login-info (read-config-file))]
+    (doseq [i (range 800 820)]
+      (try (space/delete auth i)
+           (catch Exception e))))
+  )

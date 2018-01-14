@@ -13,13 +13,17 @@
   :dependencies [[clj-http "3.7.0"]
                  [cheshire "5.8.0"]]
 
-  :aliases {"all" ["with-profiles" "+1.8:+1.9"]}
+  :aliases {"all" ["with-profile" "+1.8:+1.9"]
+            "eftest" ["with-profile" "+plugins/eftest" "eftest"]}
 
   :profiles
-  {:dev {:resource-paths ["env/dev/resources"]
+  {:plugins/eftest {:plugins [[lein-eftest "0.4.1"]]
+                    :eftest {:multithread? false}}
+   :dev {:resource-paths ["env/dev/resources"]
          :dependencies [[rkworks/baum "0.4.0"]
                         [com.stuartsierra/component "0.3.2"]
-                        [org.clojure/core.async "0.4.474"]]}
+                        [org.clojure/core.async "0.4.474"]
+                        [diehard "0.6.0"]]}
    :provided {:dependencies [[org.clojure/clojure "1.9.0"]]}
    :1.8 {:dependencies [[org.clojure/clojure "1.8.0"]]}
    :1.9 {:dependencies [[org.clojure/clojure "1.9.0"]]}})
