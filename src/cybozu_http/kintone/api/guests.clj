@@ -1,5 +1,6 @@
 (ns cybozu-http.kintone.api.guests
-  (:require [cybozu-http.kintone.api.internal.guests :as internal]))
+  (:require [cybozu-http.kintone.api.internal.guests :as internal])
+  (:import cybozu_http.kintone.api.Boundary))
 
 (defprotocol GuestsAPI
   (post
@@ -10,7 +11,7 @@
     [auth guests opts]))
 
 (extend-protocol GuestsAPI
-  clojure.lang.IPersistentMap
+  cybozu_http.kintone.api.Boundary
   (post
     ([auth guests]
      (internal/post auth guests))

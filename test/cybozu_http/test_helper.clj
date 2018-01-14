@@ -3,6 +3,7 @@
             [clojure.core.async :as async]
             [clojure.java.io :as io]
             [com.stuartsierra.component :as c]
+            [cybozu-http.kintone.api :as api]
             [cybozu-http.kintone.api.app :as app]
             [cybozu-http.kintone.api.preview-app :as preview-app]
             [cybozu-http.kintone.api.space :as space]
@@ -241,7 +242,7 @@
     app-id))
 
 (defn- setup [db]
-  (let [auth (:login-info (read-config-file))
+  (let [auth (api/map->Boundary (:login-info (read-config-file)))
         space-id (create-test-space auth)
         thread-id (:defaultThread (space/get auth space-id))
         app-id (create-test-app auth space-id thread-id)]
@@ -310,7 +311,7 @@
 (defn new-kintone-system []
   (let [{:keys [login-info space]} (read-config-file)]
     (-> (c/system-map
-         :auth login-info
+         :auth (api/map->Boundary login-info)
          :space (new-kintone-test-space space)
          :app (new-kintone-test-app))
         (c/system-using

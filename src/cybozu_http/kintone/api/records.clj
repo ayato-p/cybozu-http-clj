@@ -1,6 +1,7 @@
 (ns cybozu-http.kintone.api.records
   (:refer-clojure :exclude [get])
-  (:require [cybozu-http.kintone.api.internal.records :as internal]))
+  (:require [cybozu-http.kintone.api.internal.records :as internal])
+  (:import cybozu_http.kintone.api.Boundary))
 
 (defprotocol RecordsAPI
   (get
@@ -17,7 +18,7 @@
     [auth app-id record-ids opts]))
 
 (extend-protocol RecordsAPI
-  clojure.lang.IPersistentMap
+  cybozu_http.kintone.api.Boundary
   (get
     ([auth app-id]
      (internal/get auth app-id))

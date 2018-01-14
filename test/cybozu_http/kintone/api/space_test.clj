@@ -2,7 +2,8 @@
   (:require [clojure.set :as set]
             [clojure.test :as t]
             [cybozu-http.kintone.api.space :as s]
-            [cybozu-http.test-helper :as h]))
+            [cybozu-http.test-helper :as h]
+            [cybozu-http.kintone.api :as api]))
 
 (def db (atom {}))
 
@@ -12,7 +13,7 @@
 (t/deftest post-test
   (t/testing "space post test"
     (let [conf (h/read-config-file)
-          auth (:login-info conf)
+          auth (api/map->Boundary (:login-info conf))
           template-id (get-in conf [:space :template-id])
           members [{:entity {:type "USER" :code (:login-name auth)}
                     :isAdmin true}]
@@ -25,9 +26,9 @@
 (t/deftest get-test
   (t/testing "space get test"
     (let [conf (h/read-config-file)
-          auth (:login-info conf)
+          auth (api/map->Boundary (:login-info conf))
           template-id (get-in conf [:space :template-id])
-          members [{:entity {:type "USER" :code (:login-name auth)}
+          members [{:entity {:type "USER" :code (:login-nnnnname auth)}
                     :isAdmin true}]
           space-id (s/post auth template-id "hello my space" members)
           res (s/get auth space-id)]
@@ -42,7 +43,7 @@
 (t/deftest put-body-test
   (t/testing "space put body test"
     (let [conf (h/read-config-file)
-          auth (:login-info conf)
+          auth (api/map->Boundary (:login-info conf))
           template-id (get-in conf [:space :template-id])
           members [{:entity {:type "USER" :code (:login-name auth)}
                     :isAdmin true}]
@@ -57,7 +58,7 @@
 (t/deftest get-members-test
   (t/testing "space get members test"
     (let [conf (h/read-config-file)
-          auth (:login-info conf)
+          auth (api/map->Boundary (:login-info conf))
           template-id (get-in conf [:space :template-id])
           members [{:entity {:type "USER" :code (:login-name auth)}
                     :isAdmin true}]

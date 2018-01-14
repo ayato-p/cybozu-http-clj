@@ -1,15 +1,18 @@
 (ns cybozu-http.kintone.api.internal.bare
   (:require [cheshire.core :as c]
             [clj-http.client :as cli]
-            [slingshot.slingshot :refer [try+]])
-  (:import java.util.Base64))
+            [cybozu-http.kintone.api :as api]
+            [slingshot.slingshot :refer [try+]]
+            [clojure.string :as str])
+  (:import cybozu_http.kintone.api.Boundary
+           java.util.Base64))
 
 (def protocol "https://")
 
 (def api-prefix "/k/v1")
 (def guest-space-prefix "/k/guest/")
 
-(defn generate-url
+(defn generate-url*
   [{:keys [domain subdomain] :as auth :or {domain "cybozu.com"}} api-url guest-space-id]
   {:pre [(seq subdomain)]}
   (let [base-url (str protocol subdomain "." domain)]
@@ -17,6 +20,22 @@
           (str base-url guest-space-prefix guest-space-id "/v1")
           (str base-url api-prefix))
         (str api-url))))
+
+(defprotocol GenerateURL
+  (generate-url [auth api-url] [auth api-url guest-space-id]))
+
+(extend-protocol GenerateURL
+  cybozu_http.kintone.api.Boundary
+  (generate-url
+    ([auth api-url] (generate-url auth api-url nil))
+    ([auth api-url guest-space-id]
+     (-> (cond-> auth (str/blank? (:domain auth)) (assoc :domain "cybozu.com"))
+         (generate-url* api-url guest-space-id))))
+
+  clojure.lang.IPersistentMap
+  (generate-url
+    ([auth api-url] (generate-url auth api-url nil))
+    ([auth api-url guest-space-id] (generate-url* auth api-url guest-space-id))))
 
 (defn- base64-encode [str]
   (let [encoder (Base64/getEncoder)]
@@ -50,12 +69,13 @@
          url (generate-url auth api-url (:guest-space-id opts))
          headers (auth-headers auth)]
      (try+
-       (f url (merge headers params))
-       (catch [:type :clj-http.client/unexceptional-status] {:keys [status body]}
-         (throw (ex-info "kintone api error"
-                         (-> (try-json-parse body)
-                             (assoc :status status)
-                             (assoc :type :cybozu-http.kintone.api/exception)))))))))
+      (f url (merge headers params))
+      (catch [:type :clj-http.client/unexceptional-status] {:keys [status body]}
+        (throw (ex-info "kintone api error"
+                        (-> (try-json-parse body)
+                            (assoc :status status)
+                            (assoc :type ::api/exception)))))))))
+
 
 (defmulti build-params (fn [method params] method))
 

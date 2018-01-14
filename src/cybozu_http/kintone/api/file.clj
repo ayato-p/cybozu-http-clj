@@ -1,12 +1,13 @@
 (ns cybozu-http.kintone.api.file
-  (:require [cybozu-http.kintone.api.internal.file :as internal]))
+  (:require [cybozu-http.kintone.api.internal.file :as internal])
+  (:import cybozu_http.kintone.api.Boundary))
 
 (defprotocol FileAPI
   (upload [auth file] [auth file opts])
   (download [auth file-key] [auth file-key opts]))
 
 (extend-protocol FileAPI
-  clojure.lang.IPersistentMap
+  cybozu_http.kintone.api.Boundary
   (upload
     ([auth file]
      (internal/upload auth file))
