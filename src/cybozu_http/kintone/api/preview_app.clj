@@ -1,6 +1,5 @@
 (ns cybozu-http.kintone.api.preview-app
-  (:require [cybozu-http.kintone.api.internal.preview-app :as internal])
-  (:import cybozu_http.kintone.api.Boundary))
+  (:require [cybozu-http.kintone.api.internal.preview-app :as internal]))
 
 (defprotocol PreviewAppAPI
   (create
@@ -20,7 +19,7 @@
     [auth app-id opts]))
 
 (extend-protocol PreviewAppAPI
-  cybozu_http.kintone.api.Boundary
+  clojure.lang.Associative
   (create
     ([auth name]
      (internal/create auth name))
@@ -61,7 +60,7 @@
     [auth app-id]))
 
 (extend-protocol DeployAPI
-  cybozu_http.kintone.api.Boundary
+  clojure.lang.Associative
   (create
     ([auth name]
      (internal/create auth name))
@@ -92,7 +91,7 @@
   (put-settings [auth app-id] [auth app-id opts]))
 
 (extend-protocol SettingAPI
-  cybozu_http.kintone.api.Boundary
+  clojure.lang.Associative
   (get-settings
     ([auth app-id]
      (internal/get-settings auth app-id))
@@ -119,7 +118,7 @@
     [auth app-id field-codes opts]))
 
 (extend-protocol FieldAPI
-  cybozu_http.kintone.api.Boundary
+  clojure.lang.Associative
   (get-fields
     ([auth app-id]
      (internal/get-fields auth app-id))
@@ -146,7 +145,7 @@
   (put-layout [auth app-id layout] [auth app-id layout opts]))
 
 (extend-protocol LayoutAPI
-  cybozu_http.kintone.api.Boundary
+  clojure.lang.Associative
   (get-layout
     ([auth app-id]
      (internal/get-layout auth app-id))
@@ -163,7 +162,7 @@
   (put-views [auth app-id views] [auth app-id views opts]))
 
 (extend-protocol ViewAPI
-  cybozu_http.kintone.api.Boundary
+  clojure.lang.Associative
   (get-views
     ([auth app-id]
      (internal/get-views auth app-id))
@@ -184,7 +183,7 @@
   (put-field-acl [auth app-id rights] [auth app-id rights opts]))
 
 (extend-protocol AclAPI
-  cybozu_http.kintone.api.Boundary
+  clojure.lang.Associative
   (get-acl
     ([auth app-id]
      (internal/get-acl auth app-id))

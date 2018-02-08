@@ -1,7 +1,6 @@
 (ns cybozu-http.kintone.api.space
   (:refer-clojure :exclude [get])
-  (:require [cybozu-http.kintone.api.internal.space :as internal])
-  (:import cybozu_http.kintone.api.Boundary))
+  (:require [cybozu-http.kintone.api.internal.space :as internal]))
 
 (defprotocol SpaceAPI
   (post
@@ -18,7 +17,7 @@
     [auth space-id body opts]))
 
 (extend-protocol SpaceAPI
-  cybozu_http.kintone.api.Boundary
+  clojure.lang.Associative
   (post
     ([auth template-id name members]
      (internal/post auth template-id name members))
@@ -53,7 +52,7 @@
     [auth guest-space-id guests opts]))
 
 (extend-protocol SpaceMemberAPI
-  cybozu_http.kintone.api.Boundary
+  clojure.lang.Associative
   (get-members
     ([auth space-id]
      (internal/get-members auth space-id))

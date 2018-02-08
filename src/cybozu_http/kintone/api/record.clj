@@ -1,7 +1,6 @@
 (ns cybozu-http.kintone.api.record
   (:refer-clojure :exclude [get])
-  (:require [cybozu-http.kintone.api.internal.record :as internal])
-  (:import cybozu_http.kintone.api.Boundary))
+  (:require [cybozu-http.kintone.api.internal.record :as internal]))
 
 (defprotocol RecordAPI
   (get
@@ -15,7 +14,7 @@
     [auth app-id opts]))
 
 (extend-protocol RecordAPI
-  cybozu_http.kintone.api.Boundary
+  clojure.lang.Associative
   (get
     ([auth app-id id]
      (internal/get auth app-id id))
@@ -41,7 +40,7 @@
     [auth app-id record-id action opts]))
 
 (extend-protocol RecordProcessAPI
-  cybozu_http.kintone.api.Boundary
+  clojure.lang.Associative
   (put-assignees
     ([auth app-id record-id assignees]
      (internal/put-assignees auth app-id record-id assignees))
@@ -65,7 +64,7 @@
     [auth app-id record-id comment-id opts]))
 
 (extend-protocol RecordCommentAPI
-  cybozu_http.kintone.api.Boundary
+  clojure.lang.Associative
   (get-comments
     ([auth app-id record-id]
      (internal/get-comments auth app-id record-id))

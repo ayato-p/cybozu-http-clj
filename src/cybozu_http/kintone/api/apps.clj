@@ -1,13 +1,12 @@
 (ns cybozu-http.kintone.api.apps
   (:refer-clojure :exclude [get])
-  (:require [cybozu-http.kintone.api.internal.apps :as internal])
-  (:import cybozu_http.kintone.api.Boundary))
+  (:require [cybozu-http.kintone.api.internal.apps :as internal]))
 
 (defprotocol AppsAPI
   (get [auth] [auth opts]))
 
 (extend-protocol AppsAPI
-  cybozu_http.kintone.api.Boundary
+  clojure.lang.Associative
   (get
     ([auth]
      (internal/get auth))

@@ -1,6 +1,5 @@
 (ns cybozu-http.kintone.api.thread
-  (:require [cybozu-http.kintone.api.internal.thread :as internal])
-  (:import cybozu_http.kintone.api.Boundary))
+  (:require [cybozu-http.kintone.api.internal.thread :as internal]))
 
 (defprotocol ThreadAPI
   (put
@@ -11,7 +10,7 @@
     [auth space-id thread-id comment opts]))
 
 (extend-protocol ThreadAPI
-  cybozu_http.kintone.api.Boundary
+  clojure.lang.Associative
   (put
     ([auth thread-id]
      (internal/put auth thread-id))

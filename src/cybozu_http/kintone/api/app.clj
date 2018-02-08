@@ -1,7 +1,6 @@
 (ns cybozu-http.kintone.api.app
   (:refer-clojure :exclude [get])
-  (:require [cybozu-http.kintone.api.internal.app :as internal])
-  (:import cybozu_http.kintone.api.Boundary))
+  (:require [cybozu-http.kintone.api.internal.app :as internal]))
 
 (defprotocol AppAPI
   (get
@@ -9,7 +8,7 @@
     [auth app-id opts]))
 
 (extend-protocol AppAPI
-  cybozu_http.kintone.api.Boundary
+  clojure.lang.Associative
   (get
     ([auth app-id]
      (internal/get auth app-id))
@@ -22,7 +21,7 @@
     [auth app-id opts]))
 
 (extend-protocol AppFormAPI
-  cybozu_http.kintone.api.Boundary
+  clojure.lang.Associative
   (get-form
     ([auth app-id]
      (internal/get-form auth app-id))
@@ -35,7 +34,7 @@
     [auth app-id opts]))
 
 (extend-protocol AppFieldsAPI
-  cybozu_http.kintone.api.Boundary
+  clojure.lang.Associative
   (get-fields
     ([auth app-id]
      (internal/get-fields auth app-id))
@@ -48,7 +47,7 @@
     [auth app-id opts]))
 
 (extend-protocol AppLayoutAPI
-  cybozu_http.kintone.api.Boundary
+  clojure.lang.Associative
   (get-layout
     ([auth app-id]
      (internal/get-layout auth app-id))

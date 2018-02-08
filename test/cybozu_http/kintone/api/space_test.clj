@@ -28,7 +28,7 @@
     (let [conf (h/read-config-file)
           auth (api/map->Boundary (:login-info conf))
           template-id (get-in conf [:space :template-id])
-          members [{:entity {:type "USER" :code (:login-nnnnname auth)}
+          members [{:entity {:type "USER" :code (:login-name auth)}
                     :isAdmin true}]
           space-id (s/post auth template-id "hello my space" members)
           res (s/get auth space-id)]
