@@ -51,32 +51,6 @@
     (seq api-token)
     (assoc-in [:headers :X-Cybozu-API-Token] api-token)))
 
-(defn- try-json-parse [json]
-  (try
-    (c/parse-string json true)
-    (catch Exception e
-      {:raw json})))
-
-(defn api-call
-  ([auth method api-url params]
-   (api-call auth method api-url params nil))
-  ([auth method api-url params opts]
-   (let [f (case method
-             :get    cli/get
-             :post   cli/post
-             :put    cli/put
-             :delete cli/delete)
-         url (generate-url auth api-url (:guest-space-id opts))
-         headers (auth-headers auth)]
-     (try+
-      (f url (merge headers params))
-      (catch [:type :clj-http.client/unexceptional-status] {:keys [status body]}
-        (throw (ex-info "kintone api error"
-                        (-> (try-json-parse body)
-                            (assoc :status status)
-                            (assoc :type ::api/exception)))))))))
-
-
 (defmulti build-params (fn [method params] method))
 
 (defmethod build-params :default [_ params]
@@ -85,6 +59,55 @@
 
 (defmethod build-params :get [_ params]
   {:query-params params})
+
+(defn- try-json-parse [json]
+  (try
+    (c/parse-string json true)
+    (catch Exception e
+      {:raw json})))
+
+(defn- should-override-http-method?
+  "ref. https://developer.cybozu.io/hc/ja/articles/201941754-kintone-REST-API%E3%81%AE%E5%85%B1%E9%80%9A%E4%BB%95%E6%A7%98#step9"
+  ([^String url]
+   (should-override-http-method? url nil))
+  ([^String url ^String query-string]
+   (let [ch-cnt (cond-> (alength (.getBytes url))
+                  (not (str/blank? query-string))
+                  (+ (alength (.getBytes query-string))))]
+     (>= ch-cnt 4000))))
+
+(defn api-call
+  "opts
+  :suppress-build-params bool"
+  ([auth method api-url params]
+   (api-call auth method api-url params nil))
+  ([auth method api-url params {:keys [suppress-build-params] :as opts}]
+   (let [url ^String (generate-url auth api-url (:guest-space-id opts))
+         params' (if suppress-build-params params (build-params method params))
+         should-override? (->> (cli/generate-query-string (:query-params params'))
+                               (should-override-http-method? url))
+         method' (if should-override? :post method)
+         ;; for HTTP method override
+         params' (if suppress-build-params params (build-params method' params))
+         f (case method'
+             :get    cli/get
+             :post   cli/post
+             :put    cli/put
+             :delete cli/delete)
+         headers (cond-> (auth-headers auth)
+                   should-override?
+                   (assoc-in [:headers :X-HTTP-Method-Override] (.toUpperCase (name method))))]
+     (try+
+      (f url (merge headers params'))
+      (catch [:type :clj-http.client/unexceptional-status] {:keys [status body]}
+        (throw (ex-info "kintone api error"
+                        (-> (try-json-parse body)
+                            (assoc :status status)
+                            (assoc :request {:url url
+                                             :method method'
+                                             :headers headers
+                                             :params params'})
+                            (assoc :type ::api/exception)))))))))
 
 (defn- extract-args
   "`[foo :- foo-id, :bar :- :bar-id]`
@@ -121,7 +144,6 @@
                                  params#
                                  ~(when (seq opt-param-names)
                                     (mapv vector actual-opt-param-names opt-param-names)))
-                 params# (build-params ~method params#)
                  ~'opts ~(if (seq opt-param-names)
                            `(dissoc ~'opts ~@opt-param-names)
                            'opts)]
